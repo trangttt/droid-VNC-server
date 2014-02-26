@@ -457,6 +457,9 @@ typedef struct _rfbClientRec {
      */
     void* clientData;
     ClientGoneHookPtr clientGoneHook;
+	
+	rfbBool isRepeater;
+	rfbBool RepeaterGone;
 
     SOCKET sock;
     char *host;
@@ -782,8 +785,10 @@ extern void rfbDecrClientRef(rfbClientPtr cl);
 
 extern void rfbNewClientConnection(rfbScreenInfoPtr rfbScreen,int sock);
 extern rfbClientPtr rfbNewClient(rfbScreenInfoPtr rfbScreen,int sock);
+extern rfbClientPtr rfbNewRepeaterClient(rfbScreenInfoPtr rfbScreen,int sock,char *server_id);
 extern rfbClientPtr rfbNewUDPClient(rfbScreenInfoPtr rfbScreen);
 extern rfbClientPtr rfbReverseConnection(rfbScreenInfoPtr rfbScreen,char *host, int port);
+extern rfbClientPtr rfbRepeaterConnection(rfbScreenInfoPtr rfbScreen,char *host, int port,char *server_id);
 extern void rfbClientConnectionGone(rfbClientPtr cl);
 extern void rfbProcessClientMessage(rfbClientPtr cl);
 extern void rfbClientConnFailed(rfbClientPtr cl, const char *reason);

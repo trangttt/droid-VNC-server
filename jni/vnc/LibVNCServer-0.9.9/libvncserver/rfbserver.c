@@ -257,6 +257,27 @@ rfbReverseConnection(rfbScreenInfoPtr rfbScreen,
     return cl;
 }
 
+rfbClientPtr
+rfbRepeaterConnection(rfbScreenInfoPtr rfbScreen,
+                     char *host,
+                     int port,
+					 char *server_id)
+{
+    int sock;
+    rfbClientPtr cl;
+
+    if ((sock = rfbConnect(rfbScreen, host, port)) < 0)
+        return (rfbClientPtr)NULL;
+
+    cl = rfbNewRepeaterClient(rfbScreen, sock, server_id);
+
+    if (cl) {
+        cl->isRepeater = TRUE;
+    }
+
+    return cl;
+}
+
 
 void
 rfbSetProtocolVersion(rfbScreenInfoPtr rfbScreen, int major_, int minor_)
@@ -280,7 +301,8 @@ rfbSetProtocolVersion(rfbScreenInfoPtr rfbScreen, int major_, int minor_)
 static rfbClientPtr
 rfbNewTCPOrUDPClient(rfbScreenInfoPtr rfbScreen,
                      int sock,
-                     rfbBool isUDP)
+                     rfbBool isUDP,
+					 char *server_id)
 {
     rfbProtocolVersionMsg pv;
     rfbClientIteratorPtr iterator;
@@ -450,6 +472,33 @@ rfbNewTCPOrUDPClient(rfbScreenInfoPtr rfbScreen,
       }
 #endif
 
+		if (server_id != NULL)
+		{
+			cl->RepeaterGone = FALSE;
+			cl->isRepeater = TRUE;
+			
+			char idString[250];
+			printf("Prepairing idCode String.\n");
+			sprintf(idString, "ID:%s", server_id);
+			int l = strlen(idString);
+			//The repeater only accpets the idCode string it's 250 characters long oddly.
+			while (l < 250) {
+				idString[strlen(idString)] = '\0';
+				l++;
+			}
+			printf("idString is %s(%d).\n", idString, strlen(idString));
+			
+			printf("Sending idCode.\n");
+			if (rfbWriteExact(cl, idString, 250) < 0) {
+				rfbLogPerror("rfbNewClient: write");
+				rfbCloseClient(cl);
+				rfbClientConnectionGone(cl);
+				cl->RepeaterGone = TRUE;
+				return NULL;
+			}
+			//sleep(2);
+		}
+
       sprintf(pv,rfbProtocolVersionFormat,rfbScreen->protocolMajorVersion, 
               rfbScreen->protocolMinorVersion);
 
@@ -491,14 +540,20 @@ rfbClientPtr
 rfbNewClient(rfbScreenInfoPtr rfbScreen,
              int sock)
 {
-  return(rfbNewTCPOrUDPClient(rfbScreen,sock,FALSE));
+  return(rfbNewTCPOrUDPClient(rfbScreen,sock,FALSE, NULL));
+}
+
+rfbClientPtr
+rfbNewRepeaterClient(rfbScreenInfoPtr rfbScreen, int sock, char *server_id)
+{
+  return(rfbNewTCPOrUDPClient(rfbScreen,sock,FALSE, server_id));
 }
 
 rfbClientPtr
 rfbNewUDPClient(rfbScreenInfoPtr rfbScreen)
 {
   return((rfbScreen->udpClient=
-	  rfbNewTCPOrUDPClient(rfbScreen,rfbScreen->udpSock,TRUE)));
+	  rfbNewTCPOrUDPClient(rfbScreen,rfbScreen->udpSock,TRUE, NULL)));
 }
 
 /*
@@ -3449,5 +3504,4 @@ rfbProcessUDPInput(rfbScreenInfoPtr rfbScreen)
 	rfbDisconnectUDPSock(rfbScreen);
     }
 }
-
 

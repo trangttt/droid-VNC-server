@@ -56,6 +56,10 @@ uint8_t display_rotate_180 = 0;
 char *rhost = NULL;
 int rport = 5500;
 
+char *repeaterHost = NULL;
+int repeaterPort = 5500;
+char repeaterID[250] = "1000";
+
 void (*update_screen)(void)=NULL;
 
 enum method_type {AUTO,FRAMEBUFFER,ADB,GRALLOC,FLINGER};
@@ -291,6 +295,31 @@ void extractReverseHostPort(char *str)
 	} 
 }
 
+void extractRepeaterHostPort(char *str)
+{
+	int len = strlen(str);
+	char *p;
+	/* copy in to host */
+	repeaterHost = (char *) malloc(len+1);
+	if (! repeaterHost) {
+		L("reverse_connect: could not malloc string %d\n", len);
+		exit(-1);
+	}
+	strncpy(repeaterHost, str, len);
+	repeaterHost[len] = '\0';
+
+	/* extract port, if any */
+	if ((p = strrchr(repeaterHost, ':')) != NULL) {
+		repeaterPort = atoi(p+1);
+		if (repeaterPort < 0) {
+			repeaterPort = -repeaterPort;
+		} else if (repeaterPort < 20) {
+			repeaterPort = 5500 + repeaterPort;
+		}
+		*p = '\0';
+	} 
+}
+
 void initGrabberMethod()
 {
 	if (method == AUTO) {
@@ -322,6 +351,30 @@ void initGrabberMethod()
 		initFlinger();
 }
 
+rfbClientPtr createRepeaterClient()
+{
+	rfbClientPtr cl;
+	
+	L("Checking if repeater host set.\n");
+	if (strlen(repeaterHost) > 0)
+	{
+		L("Repeater host was set.\n");
+		char idString[250];
+		char pv[12];
+		
+		cl = rfbRepeaterConnection(vncscr, repeaterHost, repeaterPort, repeaterID);
+		
+		if (cl)
+		{
+			L("rfbRepeaterConnection Successful.\n");
+		}
+	}
+	else
+		L("No repeater host was set.\n");
+	
+	return cl;
+}
+
 void printUsage(char **argv)
 {
 	L("\nandroidvncserver [parameters]\n"
@@ -333,6 +386,8 @@ void printUsage(char **argv)
 		"-R <host:port>\t- Host for reverse connection\n" 
 		"-s <scale>\t- Scale percentage (20,30,50,100,150)\n"
 		"-z\t\t- Rotate display 180º (for zte compatibility)\n"
+		"-U <host:port>\t- UltraVNC Repeater host and port\n"
+		"-S <id>\t\t- UltraVNC Repeater Numerical Server ID for MODE 2\n"
 		"\n");
 }
 
@@ -462,12 +517,25 @@ int main(int argc, char **argv)
 		}
 	}
 
+	rfbClientPtr repeater = NULL;
+
+	if (repeaterHost != NULL)
+		repeater = createRepeaterClient();
+
 	L("Running Event Loop.\n");
 	while (1) {
 		usec=(vncscr->deferUpdateTime+standby)*1000;
 		//clock_t start = clock();
 		rfbProcessEvents(vncscr,usec);
 		
+		if (repeater && repeaterHost != NULL)
+		{
+			if (repeater->RepeaterGone == TRUE)
+			{
+				repeater = createRepeaterClient();
+			}
+		}
+
 		if (idle)
 			standby+=2;
 		else

@@ -37,7 +37,7 @@ LIBVNCSERVER_SRC_FILES:= \
 	$(LIBVNCSERVER_ROOT)/common/zywrletemplate.c \
 	$(LIBVNCSERVER_ROOT)/common/turbojpeg.c
 
-LOCAL_CFLAGS  +=  -Wall \
+LOCAL_CFLAGS  +=  -Wall -Wno-unused-variable -Wno-maybe-uninitialized -Wno-unused-but-set-variable\
 									-O3 \
 									-DLIBVNCSERVER_WITH_WEBSOCKETS \
 									-DLIBVNCSERVER_HAVE_LIBPNG \

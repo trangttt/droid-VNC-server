@@ -70,14 +70,5 @@
             android:textSize="15sp" >
         </TextView>
     </LinearLayout>
- 
-  <com.google.ads.AdView
-      android:id="@+id/adView"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:layout_alignParentBottom="true"
-      ads:adSize="BANNER"
-      ads:adUnitId="a14c45a1d8a1817"
-      android:gravity="center_horizontal" />
 
 </RelativeLayout>

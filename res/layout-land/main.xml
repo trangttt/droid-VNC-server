@@ -81,14 +81,4 @@
             </Button>
         </RelativeLayout>
     </LinearLayout>
-
-    <com.google.ads.AdView
-        android:id="@+id/adView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        ads:adSize="BANNER"
-        ads:adUnitId="a14c45a1d8a1817" />
-
 </RelativeLayout>

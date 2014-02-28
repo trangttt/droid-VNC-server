@@ -459,8 +459,7 @@ typedef struct _rfbClientRec {
     ClientGoneHookPtr clientGoneHook;
 	
 	rfbBool isRepeater;
-	rfbBool RepeaterGone;
-
+	
     SOCKET sock;
     char *host;
 
@@ -730,6 +729,8 @@ typedef struct _rfbClientRec {
 
 
 extern char rfbEndianTest;
+
+extern rfbBool RepeaterGone;
 
 #define Swap16IfLE(s) (rfbEndianTest ? Swap16(s) : (s))
 #define Swap24IfLE(l) (rfbEndianTest ? Swap24(l) : (l))

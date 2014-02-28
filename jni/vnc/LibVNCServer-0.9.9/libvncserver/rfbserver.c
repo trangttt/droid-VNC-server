@@ -474,7 +474,6 @@ rfbNewTCPOrUDPClient(rfbScreenInfoPtr rfbScreen,
 
 		if (server_id != NULL)
 		{
-			cl->RepeaterGone = FALSE;
 			cl->isRepeater = TRUE;
 			
 			char idString[250];
@@ -493,7 +492,6 @@ rfbNewTCPOrUDPClient(rfbScreenInfoPtr rfbScreen,
 				rfbLogPerror("rfbNewClient: write");
 				rfbCloseClient(cl);
 				rfbClientConnectionGone(cl);
-				cl->RepeaterGone = TRUE;
 				return NULL;
 			}
 			//sleep(2);
@@ -615,11 +613,11 @@ rfbClientConnectionGone(rfbClientPtr cl)
 
     rfbLog("Client %s gone\n",cl->host);
     free(cl->host);
-
+	
 #ifdef LIBVNCSERVER_HAVE_LIBZ
     /* Release the compression state structures if any. */
     if ( cl->compStreamInited ) {
-	deflateEnd( &(cl->compStream) );
+		deflateEnd( &(cl->compStream) );
     }
 
 #ifdef LIBVNCSERVER_HAVE_LIBJPEG
@@ -654,6 +652,15 @@ rfbClientConnectionGone(rfbClientPtr cl)
     rfbPrintStats(cl);
     rfbResetStats(cl);
 
+	//if client is a repeater lets tell it were gone.
+	if (cl->isRepeater == TRUE)
+	{
+		rfbLog("Client is a repeater. Marking repeater gone.\n");
+		RepeaterGone = TRUE;
+	}
+	else
+		rfbLog("Client is no a repeater.\n");
+	
     free(cl);
 }
 

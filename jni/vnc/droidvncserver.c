@@ -59,6 +59,7 @@ int rport = 5500;
 char *repeaterHost = NULL;
 int repeaterPort = 5500;
 char repeaterID[250] = "1000";
+rfbBool RepeaterGone = FALSE;
 
 void (*update_screen)(void)=NULL;
 
@@ -367,6 +368,18 @@ rfbClientPtr createRepeaterClient()
 		if (cl)
 		{
 			L("rfbRepeaterConnection Successful.\n");
+			RepeaterGone == FALSE;
+			cl->onHold = FALSE;
+			rfbStartOnHoldClient(cl);
+		}
+		else 
+		{
+			char *str=malloc(255*sizeof(char));
+			sprintf(str,"~SHOW|Couldn't connect to repeater host:\n%s\n",repeaterHost);
+			RepeaterGone = TRUE;
+			L("Couldn't connect to remote host: %s\n",repeaterHost);
+			sendMsgToGui(str);
+			free(str);
 		}
 	}
 	else
@@ -385,7 +398,7 @@ void printUsage(char **argv)
 		"-r <rotation>\t- Screen rotation (degrees) (0,90,180,270)\n"
 		"-R <host:port>\t- Host for reverse connection\n" 
 		"-s <scale>\t- Scale percentage (20,30,50,100,150)\n"
-		"-z\t\t- Rotate display 180ยบ (for zte compatibility)\n"
+		"-z\t\t- Rotate display 180บ (for zte compatibility)\n"
 		"-U <host:port>\t- UltraVNC Repeater host and port\n"
 		"-S <id>\t\t- UltraVNC Repeater Numerical Server ID for MODE 2\n"
 		"\n");
@@ -493,8 +506,7 @@ int main(int argc, char **argv)
 	L("	port:	 %d\n", (int)VNC_PORT);
 
 
-	L("Colourmap_rgba=%d:%d:%d:%d		lenght=%d:%d:%d:%d\n", screenformat.redShift, screenformat.greenShift, screenformat.blueShift,screenformat.alphaShift,
-	screenformat.redMax,screenformat.greenMax,screenformat.blueMax,screenformat.alphaMax);	
+	L("Colourmap_rgba=%d:%d:%d:%d		lenght=%d:%d:%d:%d\n", screenformat.redShift, screenformat.greenShift, screenformat.blueShift,screenformat.alphaShift, screenformat.redMax,screenformat.greenMax,screenformat.blueMax,screenformat.alphaMax);	
 
 	initVncServer(argc, argv);
 
@@ -522,19 +534,21 @@ int main(int argc, char **argv)
 	if (repeaterHost != NULL)
 		repeater = createRepeaterClient();
 
-	L("Running Event Loop.\n");
 	while (1) {
 		usec=(vncscr->deferUpdateTime+standby)*1000;
-		//clock_t start = clock();
-		rfbProcessEvents(vncscr,usec);
-		
-		if (repeater && repeaterHost != NULL)
+		clock_t start = clock();
+		if (repeaterHost != NULL)
 		{
-			if (repeater->RepeaterGone == TRUE)
+			//L("Checking if connection to repeater needs to be reestablished.\n");
+			if (RepeaterGone == TRUE)
 			{
-				repeater = createRepeaterClient();
+				L("Repeater connection needs to be reestablished.\n");
+				RepeaterGone = FALSE;
+				repeater = createRepeaterClient();					
 			}
 		}
+		
+		rfbProcessEvents(vncscr,usec);
 
 		if (idle)
 			standby+=2;
@@ -549,7 +563,7 @@ int main(int argc, char **argv)
 		}
 
 		update_screen(); 
-		//printf ( "%f\n", ( (double)clock() - start )*1000 / CLOCKS_PER_SEC );
+		//L( "%f\n", ( (double)clock() - start )*1000 / CLOCKS_PER_SEC );
 	}
 	close_app();
 }

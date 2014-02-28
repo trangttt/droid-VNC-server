@@ -753,9 +753,6 @@ rfbBool rfbCheckPasswordByList(rfbClientPtr cl,const char* response,int len)
 
 void rfbDoNothingWithClient(rfbClientPtr cl)
 {
-	//Instead of making a new ClientGone Function. I figured this would be quicker.
-	if (cl->isRepeater)
-		cl->RepeaterGone = TRUE;
 }
 
 static enum rfbNewClientAction rfbDefaultNewClientHook(rfbClientPtr cl)

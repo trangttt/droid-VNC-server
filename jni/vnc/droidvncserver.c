@@ -217,8 +217,6 @@ void initVncServer(int argc, char **argv)
 	rfbMarkRectAsModified(vncscr, 0, 0, vncscr->width, vncscr->height);
 }
 
-
-
 void rotate(int value)
 {
 
@@ -251,7 +249,6 @@ void rotate(int value)
 	rfbMarkRectAsModified(vncscr, 0, 0, vncscr->width, vncscr->height);
 }
 
-
 void close_app()
 { 	
 	L("Cleaning up...\n");
@@ -269,7 +266,6 @@ void close_app()
 	unbindIPCserver();
 	exit(0); /* normal exit status */
 }
-
 
 void extractReverseHostPort(char *str)
 {
@@ -318,7 +314,7 @@ void extractRepeaterHostPort(char *str)
 			repeaterPort = 5500 + repeaterPort;
 		}
 		*p = '\0';
-	} 
+	}
 }
 
 void initGrabberMethod()
@@ -332,20 +328,16 @@ void initGrabberMethod()
 		else if (initFB() != -1) {
 			method = FRAMEBUFFER;
 		}
-		#if 0
 		else if (initADB() != -1) {
 			method = ADB;
 			readBufferADB();
 		}
-		#endif
 	} else if (method == FRAMEBUFFER)
 		initFB();
-	#if 0
 	else if (method == ADB) {
 		initADB(); 
 		readBufferADB();
 	}
-	#endif
 	else if (method == GRALLOC)
 		initGralloc();
 	else if (method == FLINGER)
@@ -500,13 +492,11 @@ int main(int argc, char **argv)
 	initInput(); 
 
 	L("Initializing VNC server:\n");
-	L("	width:	%d\n", (int)screenformat.width);
-	L("	height: %d\n", (int)screenformat.height);
-	L("	bpp:		%d\n", (int)screenformat.bitsPerPixel);
-	L("	port:	 %d\n", (int)VNC_PORT);
-
-
-	L("Colourmap_rgba=%d:%d:%d:%d		lenght=%d:%d:%d:%d\n", screenformat.redShift, screenformat.greenShift, screenformat.blueShift,screenformat.alphaShift, screenformat.redMax,screenformat.greenMax,screenformat.blueMax,screenformat.alphaMax);	
+	L("\twidth:\t%d\n", (int)screenformat.width);
+	L("\theight:\t%d\n", (int)screenformat.height);
+	L("\tbpp:\t%d\n", (int)screenformat.bitsPerPixel);
+	L("\tport:\t%d\n", (int)VNC_PORT);
+	L("\tColourmap_rgba=%d:%d:%d:%d\n\tlength=%d:%d:%d:%d\n", screenformat.redShift, screenformat.greenShift, screenformat.blueShift,screenformat.alphaShift, screenformat.redMax,screenformat.greenMax,screenformat.blueMax,screenformat.alphaMax);	
 
 	initVncServer(argc, argv);
 
@@ -561,8 +551,32 @@ int main(int argc, char **argv)
 			standby=50;
 			continue;
 		}
+		else
+		{
+			if (repeaterHost != NULL)
+			{
+				if (RepeaterGone == FALSE)
+				{
+					if (repeater->protocolMajorVersion == 0)
+					{
+						idle=1;
+						standby=50;
+						continue;
+					}
+				}
+			}
+		}
 
-		update_screen(); 
+		rfbClientPtr client_ptr;
+		
+		/* scan screen if at least one client has requested */
+		for (client_ptr = vncscr->clientHead; client_ptr; client_ptr = client_ptr->next)
+		{
+			if (!sraRgnEmpty(client_ptr->requestedRegion)) {
+				update_screen();
+				break;
+			}
+		}
 		//L( "%f\n", ( (double)clock() - start )*1000 / CLOCKS_PER_SEC );
 	}
 	close_app();

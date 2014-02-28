@@ -499,7 +499,7 @@ typedef struct _rfbClientRec {
                                 /** Possible client states: */
     enum {
         RFB_PROTOCOL_VERSION,   /**< establishing protocol version */
-	RFB_SECURITY_TYPE,      /**< negotiating security (RFB v.3.7) */
+		RFB_SECURITY_TYPE,      /**< negotiating security (RFB v.3.7) */
         RFB_AUTHENTICATION,     /**< authenticating */
         RFB_INITIALISATION,     /**< sending initialisation messages */
         RFB_NORMAL,             /**< normal protocol messages */

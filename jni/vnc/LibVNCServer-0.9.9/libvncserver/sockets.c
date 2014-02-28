@@ -103,6 +103,9 @@ int deny_severity=LOG_WARNING;
 int rfbMaxClientWait = 20000;   /* time (ms) after which we decide client has
                                    gone away - needed to stop us hanging */
 
+int buffSize = 16384;
+
+
 /*
  * rfbInitSockets sets up the TCP and UDP sockets to listen for RFB
  * connections.  It does nothing if called again.
@@ -418,8 +421,10 @@ rfbProcessNewConnection(rfbScreenInfoPtr rfbScreen)
       return FALSE;
     }
 
-    if (setsockopt(sock, IPPROTO_TCP, TCP_NODELAY,
-		   (char *)&one, sizeof(one)) < 0) {
+	int ret = setsockopt(sock, SOL_SOCKET, SO_SNDBUF, &buffSize, sizeof(buffSize));
+	printf("SEND BUFFER SET %d\n",ret);
+	
+    if (setsockopt(sock, IPPROTO_TCP, TCP_NODELAY, (char *)&one, sizeof(one)) < 0) {
       rfbLogPerror("rfbCheckFds: setsockopt");
       closesocket(sock);
       return FALSE;
@@ -837,20 +842,23 @@ rfbListenOnTCPPort(int port,
     addr.sin_addr.s_addr = iface;
 
     if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-	return -1;
+		return -1;
     }
-    if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR,
-		   (char *)&one, sizeof(one)) < 0) {
-	closesocket(sock);
-	return -1;
+	
+	int ret = setsockopt(sock, SOL_SOCKET, SO_SNDBUF, &buffSize, sizeof(buffSize));
+	printf("SEND BUFFER SET %d\n",ret);
+	
+    if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, (char *)&one, sizeof(one)) < 0) {
+		closesocket(sock);
+		return -1;
     }
     if (bind(sock, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
-	closesocket(sock);
-	return -1;
+		closesocket(sock);
+		return -1;
     }
     if (listen(sock, 32) < 0) {
-	closesocket(sock);
-	return -1;
+		closesocket(sock);
+		return -1;
     }
 
     return sock;
@@ -986,20 +994,20 @@ rfbConnectToTcpAddr(char *host,
 
     if ((addr.sin_addr.s_addr = inet_addr(host)) == htonl(INADDR_NONE))
     {
-	if (!(hp = gethostbyname(host))) {
-	    errno = EINVAL;
-	    return -1;
-	}
-	addr.sin_addr.s_addr = *(unsigned long *)hp->h_addr;
+		if (!(hp = gethostbyname(host))) {
+			errno = EINVAL;
+			return -1;
+		}
+		addr.sin_addr.s_addr = *(unsigned long *)hp->h_addr;
     }
 
     if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-	return -1;
+		return -1;
     }
 
     if (connect(sock, (struct sockaddr *)&addr, (sizeof(addr))) < 0) {
-	closesocket(sock);
-	return -1;
+		closesocket(sock);
+		return -1;
     }
 #endif
     return sock;
@@ -1019,14 +1027,18 @@ rfbListenOnUDPPort(int port,
     addr.sin_addr.s_addr = iface;
 
     if ((sock = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
-	return -1;
+		return -1;
     }
+	
+	int ret = setsockopt(sock, SOL_SOCKET, SO_SNDBUF, &buffSize, sizeof(buffSize));
+	printf("SEND BUFFER SET %d\n",ret);
+	
     if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR,
 		   (char *)&one, sizeof(one)) < 0) {
-	return -1;
+		return -1;
     }
     if (bind(sock, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
-	return -1;
+		return -1;
     }
 
     return sock;

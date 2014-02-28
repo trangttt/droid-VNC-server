@@ -85,7 +85,7 @@ public class MainActivity extends Activity
 		IntentFilter i;
 		i = new IntentFilter("org.onaips.vnc.ACTIVITY_UPDATE");
 		ActivityUpdateReceiver receiver=new ActivityUpdateReceiver();
-		registerReceiver(receiver, i);
+		this.getBaseContext().registerReceiver(receiver, i);
 
 		super.onResume();
 	}
@@ -96,13 +96,16 @@ public class MainActivity extends Activity
 		@Override
 		public void onReceive(Context context, Intent intent)//this method receives broadcast messages. Be sure to modify AndroidManifest.xml file in order to enable message receiving
 		{
+			log("ActivityUpdateReceiver.onReceive");
 			try {
 				Thread.sleep(2000);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-					setStateLabels(ServerManager.isServerRunning());		
+			
+			log("ServerManager.isServerRunning() = "+ServerManager.isServerRunning());
+			setStateLabels(ServerManager.isServerRunning());		
 		}
 	}
 
@@ -136,7 +139,7 @@ public class MainActivity extends Activity
 	{
 		super.onCreate(savedInstanceState);  
 
-		requestWindowFeature(Window.FEATURE_NO_TITLE); 
+		//requestWindowFeature(Window.FEATURE_NO_TITLE); 
 
 		setContentView(R.layout.main);
 
@@ -211,7 +214,12 @@ public class MainActivity extends Activity
 				restartServer();
 				return;
 			}
-		}); 
+		});
+		
+		IntentFilter i;
+		i = new IntentFilter("org.onaips.vnc.ACTIVITY_UPDATE");
+		ActivityUpdateReceiver receiver=new ActivityUpdateReceiver();
+		this.getBaseContext().registerReceiver(receiver, i);
 	}
 
 	

@@ -123,6 +123,19 @@ public class ServerManager extends Service {
 			if (preferences.getBoolean("rotate_zte", false))
 				display_zte = "-z";
 			
+			String repeater_check = "";
+			String serverid_check = "";
+			if (preferences.getBoolean("enableMode2Repeater", false))
+			{
+				String repeater = preferences.getString("repeaterHostPort", "");
+				String server_id = preferences.getString("repeaterServerID", "");
+				if (!repeater.equals(""))
+					repeater_check = "-U " + repeater;
+				
+				if (!server_id.equals(""))
+					serverid_check = "-S " + server_id;
+			}
+			
 			//our exec file is disguised as a library so it will get packed to lib folder according to cpu_abi
 			String droidvncserver_exec=getFilesDir().getParent() + "/lib/libandroidvncserver.so";
 			File f=new File (droidvncserver_exec);
@@ -139,7 +152,7 @@ public class ServerManager extends Service {
  
 			String permission_string="chmod 777 " + droidvncserver_exec;
 			String server_string= droidvncserver_exec  + " " + password_check + " " + rotation+ " " + scaling_string + " " + port_string + " "
-			+ reverse_string + " " + display_method + " " + display_zte;
+			+ reverse_string + " " + display_method + " " + display_zte + " " + repeater_check + " " + serverid_check;
  
 			boolean root=preferences.getBoolean("asroot",true);
 			root &= MainActivity.hasRootPermission();
@@ -158,9 +171,8 @@ public class ServerManager extends Service {
 				Runtime.getRuntime().exec(permission_string);
 				Runtime.getRuntime().exec(server_string,null,new File(files_dir));
 			}
-			// dont show password on logcat
-			log("Starting " + droidvncserver_exec  + " " + rotation+ " " + scaling_string + " " + port_string + " "
-					+ reverse_string + " " + display_method + " " + display_zte);
+			
+			log("Starting " + server_string);
 
 		} catch (IOException e) {
 			log("startServer():" + e.getMessage());
@@ -202,9 +214,6 @@ public class ServerManager extends Service {
 		}
 	}
 
-	
-	
-	
 	public static boolean isServerRunning() {
 		try {
 			byte[] receiveData = new byte[1024];
@@ -215,19 +224,21 @@ public class ServerManager extends Service {
 			String toSend = "~PING|";
 			byte[] buffer = toSend.getBytes();
 
-			DatagramPacket question = new DatagramPacket(buffer, buffer.length,
-					addr, 13132);
+			DatagramPacket question = new DatagramPacket(buffer, buffer.length, addr, 13132);
 			clientSocket.send(question);
 
-			DatagramPacket receivePacket = new DatagramPacket(receiveData,
-					receiveData.length);
+			DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
 			clientSocket.receive(receivePacket);
 			String receivedString = new String(receivePacket.getData());
-			receivedString = receivedString.substring(0, receivePacket
-					.getLength());
+			receivedString = receivedString.substring(0, receivePacket.getLength());
 
-			return receivedString.equals("~PONG|");
+			Log.v(MainActivity.VNC_LOG, "isServerRunning() receivedString: " + receivedString);
+			if (receivedString.equals("~PONG|"))
+				return true;
+			else
+				return false;
 		} catch (Exception e) {
+			Log.e(MainActivity.VNC_LOG, "isServerRunning() Error: " + e);
 			return false;
 		}
 	}
@@ -267,8 +278,12 @@ public class ServerManager extends Service {
 						resp = resp.substring(6, resp.length() - 1);
 						showTextOnScreen(resp);
 					} else if (resp.length() > 15
-							&& (resp.substring(0, 15).equals("~SERVERSTARTED|") || resp
-									.substring(0, 15).equals("~SERVERSTOPPED|"))) {
+							&& (resp.substring(0, 15).equals("~SERVERSTARTED|") || 
+								resp.substring(0, 15).equals("~SERVERSTOPPED|"))) {
+						if (resp.substring(0, 15).equals("~SERVERSTARTED|"))
+							serverOn = true;
+						else
+							serverOn = false;
 						Intent intent = new Intent("org.onaips.vnc.ACTIVITY_UPDATE");
 						sendBroadcast(intent);
 					} 

@@ -25,64 +25,64 @@
 #include <binder/IServiceManager.h>
 
 #include <binder/IMemory.h>
-#include <surfaceflinger/ISurfaceComposer.h>
-#include <surfaceflinger/SurfaceComposerClient.h>
+#include <gui/ISurfaceComposer.h>
+#include <gui/SurfaceComposerClient.h>
 
 using namespace android;
 
+static uint32_t DEFAULT_DISPLAY_ID = ISurfaceComposer::eDisplayIdMain;
+int32_t displayId = DEFAULT_DISPLAY_ID;
+sp<IBinder> display = SurfaceComposerClient::getBuiltInDisplay(displayId);
 ScreenshotClient *screenshotClient=NULL;
 
 extern "C" screenFormat getscreenformat_flinger()
 {
-  //get format on PixelFormat struct
-	PixelFormat f=screenshotClient->getFormat();
+    //get format on PixelFormat struct
+    PixelFormat f=screenshotClient->getFormat();
 
-	PixelFormatInfo pf;
-	getPixelFormatInfo(f,&pf);
+    PixelFormatInfo pf;
+    getPixelFormatInfo(f,&pf);
 
-	screenFormat format;
+    screenFormat format;
 
-	format.bitsPerPixel = pf.bitsPerPixel;
-	format.width = screenshotClient->getWidth();
-	format.height =     screenshotClient->getHeight();
-	format.size = pf.bitsPerPixel*format.width*format.height/CHAR_BIT;
-	format.redShift = pf.l_red;
-	format.redMax = pf.h_red;
-	format.greenShift = pf.l_green;
-	format.greenMax = pf.h_green-pf.h_red;
-	format.blueShift = pf.l_blue;
-	format.blueMax = pf.h_blue-pf.h_green;
-	format.alphaShift = pf.l_alpha;
-	format.alphaMax = pf.h_alpha-pf.h_blue;
+    format.bitsPerPixel = pf.bitsPerPixel;
+    format.width        = screenshotClient->getWidth();
+    format.height       = screenshotClient->getHeight();
+    format.size         = pf.bitsPerPixel*format.width*format.height/CHAR_BIT;
+    format.redShift     = pf.l_red;
+    format.redMax       = pf.h_red - pf.l_red;
+    format.greenShift   = pf.l_green;
+    format.greenMax     = pf.h_green - pf.l_green;
+    format.blueShift    = pf.l_blue;
+    format.blueMax      = pf.h_blue - pf.l_blue;
+    format.alphaShift   = pf.l_alpha;
+    format.alphaMax     = pf.h_alpha-pf.l_alpha;
 
-	return format;
+    return format;
 }
 
 
 extern "C" int init_flinger()
 {
-	int errno;
+    int errno;
 
-	L("--Initializing gingerbread access method--\n");
+    L("--Initializing gingerbread access method--\n");
 
-  screenshotClient = new ScreenshotClient();
-	errno = screenshotClient->update();
-  if (!screenshotClient->getPixels())
-    return -1;
-
-  if (errno != NO_ERROR) {
-		return -1;
-	}
-	return 0;
+    screenshotClient = new ScreenshotClient();
+    errno = screenshotClient->update(display);
+    if (display != NULL && errno == NO_ERROR)
+        return 0;
+    else
+        return -1;
 }
 
 extern "C" unsigned int *readfb_flinger()
 {
-	screenshotClient->update();
-	return (unsigned int*)screenshotClient->getPixels();
+    screenshotClient->update(display);
+    return (unsigned int*)screenshotClient->getPixels();
 }
 
 extern "C" void close_flinger()
 {
-  free(screenshotClient);
+    free(screenshotClient);
 }

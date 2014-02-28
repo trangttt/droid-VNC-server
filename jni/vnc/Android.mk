@@ -42,8 +42,8 @@ LOCAL_CFLAGS  +=  -Wall -Wno-unused-variable -Wno-maybe-uninitialized -Wno-unuse
 									-DLIBVNCSERVER_WITH_WEBSOCKETS \
 									-DLIBVNCSERVER_HAVE_LIBPNG \
 									-DLIBVNCSERVER_HAVE_ZLIB \
-									-DLIBVNCSERVER_HAVE_LIBJPEG \
-									-DRK3066
+									-DLIBVNCSERVER_HAVE_LIBJPEG 
+									#-DRK3066
 
 LOCAL_LDLIBS +=  -llog -lz -ldl 
 
@@ -63,6 +63,7 @@ LOCAL_C_INCLUDES += \
 										$(LOCAL_PATH)/screenMethods \
 										$(LOCAL_PATH)/inputMethods \
 										$(LOCAL_PATH)/suinput \
+										$(LOCAL_PATH)/linux \
 										$(LOCAL_PATH)/../libpng \
 										$(LOCAL_PATH)/../libjpeg-turbo \
 										$(LOCAL_PATH)/../openssl/include \

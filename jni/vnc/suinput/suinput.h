@@ -24,8 +24,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <linux/input.h>
 #include <linux/uinput.h>
 
-int suinput_write(int uinput_fd,
-                         uint16_t type, uint16_t code, int32_t value);
+int suinput_write(int uinput_fd, uint16_t type, uint16_t code, int32_t value);
 /*
   Creates and opens a connection to the event device. Returns an uinput file
   descriptor on success. On error, -1 is returned, and errno is set

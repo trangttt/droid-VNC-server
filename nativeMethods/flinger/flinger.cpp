@@ -205,7 +205,7 @@ extern "C" int init_flinger()
 {
     int errno;
 
-    L("--Initializing gingerbread access method--\n");
+    L("--Initializing KITKAT access method--\n");
 
     screenshotClient = new ScreenshotClient();
     errno = screenshotClient->update(display);

@@ -353,6 +353,7 @@ public class ServerManager extends Service {
 	}
 
 	static void writeCommand(OutputStream os, String command) throws Exception {
+    Log.v(MainActivity.VNC_LOG, "EXECUTING COMMAND: " + command);
 		os.write((command + "\n").getBytes("ASCII"));
 	}
 

@@ -84,6 +84,6 @@ screenFormat screenformat;
 #endif
 
 #define ARR_LEN(a) (sizeof(a)/sizeof(a)[0])
-static int compiled_sdks[] = {14, 15, 17};
+static int compiled_sdks[] = {19};
 
 #endif

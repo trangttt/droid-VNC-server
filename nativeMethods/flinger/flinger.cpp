@@ -36,7 +36,7 @@ int32_t displayId = DEFAULT_DISPLAY_ID;
 sp<IBinder> display = SurfaceComposerClient::getBuiltInDisplay(displayId);
 ScreenshotClient *screenshotClient=NULL;
 
-struct PixelFormatInfo {
+struct PixelFormatInformation {
     enum {
         INDEX_ALPHA   = 0,
         INDEX_RED     = 1,
@@ -58,7 +58,7 @@ struct PixelFormatInfo {
         uint8_t l;
     };
 
-    inline PixelFormatInfo() : version(sizeof(PixelFormatInfo)) { }
+    inline PixelFormatInformation() : version(sizeof(PixelFormatInformation)) { }
     size_t getScanlineSize(unsigned int width) const;
     size_t getSize(size_t ci) const {
         return (ci <= 3) ? (cinfo[ci].h - cinfo[ci].l) : 0;
@@ -123,12 +123,12 @@ static const Info* gGetPixelFormatTable(size_t* numEntries) {
     return sPixelFormatInfos;
 }
 
-status_t getPixelFormatInfo(PixelFormat format, PixelFormatInfo* info)
+status_t getPixelFormatInformation(PixelFormat format, PixelFormatInformation* info)
 {
     if (format <= 0)
         return BAD_VALUE;
 
-    if (info->version != sizeof(PixelFormatInfo))
+    if (info->version != sizeof(PixelFormatInformation))
         return INVALID_OPERATION;
 
     // YUV format from the HAL are handled here
@@ -179,8 +179,8 @@ extern "C" screenFormat getscreenformat_flinger()
     //get format on PixelFormat struct
     PixelFormat f=screenshotClient->getFormat();
 
-    PixelFormatInfo pf;
-    getPixelFormatInfo(f,&pf);
+    PixelFormatInformation pf;
+    getPixelFormatInformation(f,&pf);
 
     screenFormat format;
 

@@ -42,13 +42,13 @@ void initInput()
 {
 	L("---Initializing uinput...---\n");
 	struct input_id id = {
-		BUS_VIRTUAL, /* Bus type. */
+		BUS_VIRTUAL, /* Bus type. 0x06*/
 		1, /* Vendor id. */
 		1, /* Product id. */
 		1 /* Version id. */
 	}; 
 
-	if((inputfd = suinput_open("Generic", &id)) == -1)
+	if((inputfd = suinput_open("VNC", &id)) == -1)
 	{
 		L("cannot create virtual kbd device.\n");
 		sendMsgToGui("~SHOW|Cannot create virtual input device!\n");
@@ -344,7 +344,7 @@ void ptrEvent(int buttonMask, int x, int y, rfbClientPtr cl)
 		return;
 			
 	setIdle(0);
-	transformTouchCoordinates(&x,&y,cl->screen->width,cl->screen->height);
+	//transformTouchCoordinates(&x,&y,cl->screen->width,cl->screen->height);
 
 	if((buttonMask & 1)&& leftClicked) {//left btn clicked and moving
 		static int i=0;
@@ -359,11 +359,11 @@ void ptrEvent(int buttonMask, int x, int y, rfbClientPtr cl)
 	}
 	else if (buttonMask & 1)//left btn clicked
 	{
-		leftClicked=1;
+		leftClicked = 1;
 
 		suinput_write(inputfd, EV_ABS, ABS_X, x);
 		suinput_write(inputfd, EV_ABS, ABS_Y, y);
-		suinput_write(inputfd,EV_KEY,BTN_TOUCH,1);
+		suinput_write(inputfd, EV_KEY, BTN_TOUCH, 1);
 		suinput_write(inputfd, EV_SYN, SYN_REPORT, 0);
 	}
 	else if (leftClicked)//left btn released

@@ -76,11 +76,11 @@ int suinput_open(const char* device_name, const struct input_id* id)
     /* Key and button events */
      if (ioctl(uinput_fd, UI_SET_EVBIT, EV_KEY) == -1)
          goto err;
-// 
+//
 //     /* Key and button repetition events */
      if (ioctl(uinput_fd, UI_SET_EVBIT, EV_REP) == -1)
          goto err;
-//     
+//
 //     /* Relative pointer motions */
 //     if (ioctl(uinput_fd, UI_SET_EVBIT, EV_REL) == -1)
 //         goto err;
@@ -108,7 +108,9 @@ int suinput_open(const char* device_name, const struct input_id* id)
     if (ioctl(uinput_fd, UI_SET_ABSBIT, ABS_Y) == -1)
         goto err;
 
-    
+    /* Configure device as a touch device */
+    if (ioctl(uinput_fd, UI_SET_PROPBIT, INPUT_PROP_DIRECT) == -1)
+        goto err;
 
     /* Configure device to handle all keys, see linux/input.h. */
     for (i = 0; i < KEY_MAX; i++) {
@@ -124,16 +126,10 @@ int suinput_open(const char* device_name, const struct input_id* id)
     user_dev.id.product = id->product;
     user_dev.id.version = id->version;
 
-    //minor tweak to support ABSolute events
-    //user_dev.absmin[ABS_X] = -2047;
-    user_dev.absmax[ABS_X] = 2048;
-    //user_dev.absfuzz[ABS_X] = 0;
-    //user_dev.absflat[ABS_X] = 0;
-
-    //user_dev.absmin[ABS_Y] = -2047;
-    user_dev.absmax[ABS_Y] = 2048;
-    //user_dev.absfuzz[ABS_Y] = 0;
-    //user_dev.absflat[ABS_Y] = 0;
+    user_dev.absmin[ABS_X] = 0;
+    user_dev.absmax[ABS_X] = 768;
+    user_dev.absmin[ABS_Y] = 0;
+    user_dev.absmax[ABS_Y] = 1280;
 
     if (write(uinput_fd, &user_dev, sizeof(user_dev)) != sizeof(user_dev))
         goto err;

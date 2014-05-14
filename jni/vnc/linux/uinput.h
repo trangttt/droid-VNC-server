@@ -117,6 +117,17 @@ struct uinput_ff_erase {
 #define UI_SET_PHYS			_IOW(UINPUT_IOCTL_BASE, 108, char*)
 #define UI_SET_SWBIT		_IOW(UINPUT_IOCTL_BASE, 109, int)
 
+// UI_SET_PROPBIT is normally defined in /uapi/linux/uinput.h
+// but we need it for proper touch support */
+#define UI_SET_PROPBIT      _IOW(UINPUT_IOCTL_BASE, 110, int)
+
+#define INPUT_PROP_POINTER      0x00
+#define INPUT_PROP_DIRECT       0x01
+//#define INPUT_PROP_BUTTONPAD    0x02
+//#define INPUT_PROP_SEMI_MT      0x03
+//#define INPUT_PROP_MAX          0x1f
+//#define INPUT_PROP_CNT          (INPUT_PROP_MAX + 1)
+
 #define UI_BEGIN_FF_UPLOAD	_IOWR(UINPUT_IOCTL_BASE, 200, struct uinput_ff_upload)
 #define UI_END_FF_UPLOAD	_IOW(UINPUT_IOCTL_BASE, 201, struct uinput_ff_upload)
 #define UI_BEGIN_FF_ERASE	_IOWR(UINPUT_IOCTL_BASE, 202, struct uinput_ff_erase)

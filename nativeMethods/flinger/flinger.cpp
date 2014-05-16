@@ -17,6 +17,8 @@
 	 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 	 */
 
+#include <fcntl.h>
+
 #include "flinger.h"
 #include "screenFormat.h"
 
@@ -33,6 +35,7 @@ using namespace android;
 static uint32_t DEFAULT_DISPLAY_ID = ISurfaceComposer::eDisplayIdMain;
 static const int COMPONENT_YUV = 0xFF;
 int32_t displayId = DEFAULT_DISPLAY_ID;
+size_t Bpp = 32;
 sp<IBinder> display = SurfaceComposerClient::getBuiltInDisplay(displayId);
 ScreenshotClient *screenshotClient=NULL;
 
@@ -184,6 +187,9 @@ extern "C" screenFormat getscreenformat_flinger()
 
     screenFormat format;
 
+    Bpp = bytesPerPixel(f);
+    L("Bpp set to %d\n", Bpp);
+
     format.bitsPerPixel = bitsPerPixel(f);
     format.width        = screenshotClient->getWidth();
     format.height       = screenshotClient->getHeight();
@@ -205,20 +211,57 @@ extern "C" int init_flinger()
 {
     int errno;
 
-    L("--Initializing KITKAT access method--\n");
+    L("--Initializing JellyBean access method--\n");
 
     screenshotClient = new ScreenshotClient();
+    L("ScreenFormat: %d\n", screenshotClient->getFormat());
     errno = screenshotClient->update(display);
+    L("Screenshot client updated its display on init.\n");
     if (display != NULL && errno == NO_ERROR)
         return 0;
     else
         return -1;
 }
 
+extern "C" unsigned int *checkfb_flinger()
+{
+    screenshotClient->update(display);
+    void const* base = screenshotClient->getPixels();
+    return (unsigned int*)base;
+}
+
 extern "C" unsigned int *readfb_flinger()
 {
     screenshotClient->update(display);
-    return (unsigned int*)screenshotClient->getPixels();
+    void const* base = 0;
+    uint32_t w, s, h, f;
+    size_t size = 0;
+    base = screenshotClient->getPixels();
+    w = screenshotClient->getWidth();
+    h = screenshotClient->getHeight();
+    s = screenshotClient->getStride();
+    f = screenshotClient->getFormat();
+    size = screenshotClient->getSize();
+    L("Mallocing %d bytes\n", w*h*Bpp);
+    void* new_base;
+    new_base = malloc(w*h*Bpp);
+    void* THEFINALREFERENCE = new_base;
+    L("Malloced address: %p\n", new_base);
+    for (size_t y=0; y<h; y++) {
+        /*
+        for (size_t x=0; x<w; x++) {
+            *(new_base+(y*w + x)) = *(base+(y*w + x))
+        }
+        base = (void *)((char *)base + s*Bpp);
+        */
+        memcpy(new_base, base, w*Bpp);
+        //L("Copied row %d\n", y);
+        new_base = new_base + w*Bpp;
+        //L("Address is now  %d\n", &new_base);
+        base = (void *)((char *)base + s*Bpp);
+    }
+    L("Returning new buffer\n");
+    return (unsigned int *)THEFINALREFERENCE;
 }
 
 extern "C" void close_flinger()

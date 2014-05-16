@@ -27,6 +27,7 @@
 extern "C" {
 #endif
   unsigned int * readfb_flinger();
+  unsigned int * checkfb_flinger();
   int init_flinger();
   void close_flinger();
 #ifdef __cplusplus

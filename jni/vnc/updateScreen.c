@@ -22,9 +22,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 void FUNCTION(void)
 {	
+  L("Updating Screen\n");
 	int i,j,r;
 	int offset=0,pixelToVirtual;
-	OUT_T* a;
+	//OUT_T* a;
 	OUT_T* b=0;
 	struct fb_var_screeninfo scrinfo; //we'll need this to detect double FB on framebuffer
 
@@ -33,6 +34,7 @@ void FUNCTION(void)
 		rotation+=180;
 	}
 
+  L("Getting buffer in updateScreen.\n");
 	if (method==FRAMEBUFFER) {
 		scrinfo = FB_getscrinfo();
 		b = (OUT_T*) readBufferFB();
@@ -44,16 +46,16 @@ void FUNCTION(void)
 	else if (method==FLINGER)
 		b = (OUT_T*) readBufferFlinger();
 
-	a = (OUT_T*)cmpbuf;
-//	memcpy(vncbuf,b,screenformat.width*screenformat.height*screenformat.bitsPerPixel/CHAR_BIT);
-//	rfbMarkRectAsModified(vncscr, 0, 0, vncscr->width, vncscr->height);
-//	return;
+  L("Buffer address is %p\n", b);
+	//a = (OUT_T*)cmpbuf;
 
 	int max_x=-1,max_y=-1, min_x=99999, min_y=99999;
 	int h;
-	idle=1;
+	idle=0;
 
-	if (rotation==0) {
+  /*
+	if (rotation==1) {
+    L("iterating over buffer\n");
 		for (j = 0; j < vncscr->height; j++) {
 			for (i = 0; i < vncscr->width; i++) {
 				offset = j * vncscr->width;
@@ -82,6 +84,7 @@ void FUNCTION(void)
 				}
 			}
 		}
+    L("done iterating\n");
 	}
 	else if (rotation==90) {
 		for (j = 0; j < vncscr->width; j++) {
@@ -177,20 +180,24 @@ void FUNCTION(void)
 			}
 		}
 	}
+  */
 
 	if (!idle) {
-		memcpy(vncbuf,a,screenformat.width*screenformat.height*screenformat.bitsPerPixel/CHAR_BIT);
+    L("Copying %d bytes into vncbuffer\n", screenformat.width*screenformat.height*screenformat.bitsPerPixel/CHAR_BIT);
+		memcpy(vncbuf,b,screenformat.width*screenformat.height*screenformat.bitsPerPixel/CHAR_BIT);
 
 		min_x--;
 		min_x--;
 		max_x++;
 		max_y++;
 
-		//	L("Changed x(%d-%d) y(%d-%d)\n",min_x,max_x,min_y,max_y);
+		//L("Changed x(%d-%d) y(%d-%d)\n",min_x,max_x,min_y,max_y);
 
-		rfbMarkRectAsModified(vncscr, min_x, min_y, max_x, max_y);
+		rfbMarkRectAsModified(vncscr, 0, 0, screenformat.width, screenformat.height);
 	}
-	
+  L("Freeing address: %p\n", b);
+  free(b);
+  L("Freed\n");
 	if (display_rotate_180)
 		rotation=r;
 }

@@ -26,6 +26,7 @@ void *flinger_lib = NULL;
 
 close_fn_type close_flinger = NULL;
 readfb_fn_type readfb_flinger = NULL;
+checkfb_fn_type checkfb_flinger = NULL;
 getscreenformat_fn_type getscreenformat_flinger = NULL;
 
 int initFlinger(void)
@@ -65,6 +66,12 @@ int initFlinger(void)
 			continue;
 		}
 
+		checkfb_flinger = dlsym(flinger_lib,"checkfb_flinger");
+		if(checkfb_flinger == NULL) {
+			L("Couldn't load checkfb_flinger! Error string: %s\n",dlerror());
+			continue;
+		}
+
 		getscreenformat_flinger = dlsym(flinger_lib,"getscreenformat_flinger");
 		if(getscreenformat_flinger == NULL) {
 			L("Couldn't load get_screenformat! Error string: %s\n",dlerror());
@@ -73,7 +80,7 @@ int initFlinger(void)
 		L("AKI1\n");
 
 		int ret = init_flinger();
-		L("AKII12");
+		L("AKII12\n");
 		if (ret == -1) {
 			 L("flinger method not supported by this device!\n");
 			 continue;
@@ -86,7 +93,7 @@ int initFlinger(void)
 			continue;;
 		}
 	
-		if ( readBufferFlinger() == NULL) {
+		if ( checkBufferFlinger() == NULL) {
 			L("Error: Could not read surfaceflinger buffer!\n");
 			continue;
 		}
@@ -118,3 +125,9 @@ unsigned char *readBufferFlinger(void)
 	return NULL;
 }
 
+unsigned char *checkBufferFlinger(void)
+{
+	if (checkfb_flinger)
+		return checkfb_flinger();
+	return NULL;
+}

@@ -25,6 +25,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 int initFlinger(void);
 void closeFlinger(void);
 unsigned char *readBufferFlinger(void);
+unsigned char *checkBufferFlinger(void);
 screenFormat getScreenFormatFlinger(void);
 
 #endif

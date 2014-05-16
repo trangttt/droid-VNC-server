@@ -66,6 +66,7 @@ struct fbinfo {
 typedef int (*init_fn_type)(void);
 typedef int (*close_fn_type)(void);
 typedef unsigned char * (*readfb_fn_type)(void);
+typedef unsigned char * (*checkfb_fn_type)(void);
 typedef screenFormat (*getscreenformat_fn_type)(void);
 
 void rotate(int);

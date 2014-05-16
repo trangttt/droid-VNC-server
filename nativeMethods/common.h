@@ -77,8 +77,8 @@ void close_app();
 screenFormat screenformat;
 
 #ifdef NOAPP
-#define DVNC_FILES_PATH "/sdcard/vnc/files/"
-#define DVNC_LIB_PATH "/system/lib/"
+#define DVNC_FILES_PATH "/data/local"
+#define DVNC_LIB_PATH "/data/local"
 #else
 #define DVNC_FILES_PATH "/data/data/org.onaips.vnc/files/"
 #define DVNC_LIB_PATH "/data/data/org.onaips.vnc/lib/"

@@ -20,7 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #ifndef COMMON_H
 #define COMMON_H
 
-#include <android/log.h> 
+#include <android/log.h>
 #ifndef __cplusplus
 
 #include <dirent.h>
@@ -30,8 +30,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include <unistd.h>
 #include <sys/mman.h>
-#include <sys/ioctl.h>     
- 
+#include <sys/ioctl.h>
+
 #include <sys/stat.h>
 #include <sys/sysmacros.h>             /* For makedev() */
 
@@ -76,12 +76,12 @@ void setIdle(int i);
 void close_app();
 screenFormat screenformat;
 
-#ifndef RK3066
-#define DVNC_FILES_PATH "/data/data/org.onaips.vnc/files/"
-#define DVNC_LIB_PATH "/data/data/org.onaips.vnc/lib/"
-#else
+#ifdef NOAPP
 #define DVNC_FILES_PATH "/sdcard/vnc/files/"
 #define DVNC_LIB_PATH "/system/lib/"
+#else
+#define DVNC_FILES_PATH "/data/data/org.onaips.vnc/files/"
+#define DVNC_LIB_PATH "/data/data/org.onaips.vnc/lib/"
 #endif
 
 #define ARR_LEN(a) (sizeof(a)/sizeof(a)[0])

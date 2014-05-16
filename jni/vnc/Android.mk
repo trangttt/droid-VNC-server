@@ -42,10 +42,11 @@ LOCAL_CFLAGS  +=  -Wall -Wno-unused-variable -Wno-maybe-uninitialized -Wno-unuse
 									-DLIBVNCSERVER_WITH_WEBSOCKETS \
 									-DLIBVNCSERVER_HAVE_LIBPNG \
 									-DLIBVNCSERVER_HAVE_ZLIB \
-									-DLIBVNCSERVER_HAVE_LIBJPEG 
+									-DLIBVNCSERVER_HAVE_LIBJPEG \
+									-DNOAPP
 									#-DRK3066
 
-LOCAL_LDLIBS +=  -llog -lz -ldl 
+LOCAL_LDLIBS +=  -llog -lz -ldl
 
 LOCAL_SRC_FILES += \
 									 $(LIBVNCSERVER_SRC_FILES)\
@@ -56,7 +57,7 @@ LOCAL_SRC_FILES += \
 									 screenMethods/framebuffer.c \
 									 screenMethods/gralloc.c \
 									 screenMethods/flinger.c \
-									 suinput/suinput.c 
+									 suinput/suinput.c
 
 LOCAL_C_INCLUDES += \
 										$(LOCAL_PATH) \

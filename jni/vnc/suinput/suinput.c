@@ -127,9 +127,9 @@ int suinput_open(const char* device_name, const struct input_id* id)
     user_dev.id.version = id->version;
 
     user_dev.absmin[ABS_X] = 0;
-    user_dev.absmax[ABS_X] = 768;
+    user_dev.absmax[ABS_X] = 1080;
     user_dev.absmin[ABS_Y] = 0;
-    user_dev.absmax[ABS_Y] = 1280;
+    user_dev.absmax[ABS_Y] = 1920;
 
     if (write(uinput_fd, &user_dev, sizeof(user_dev)) != sizeof(user_dev))
         goto err;

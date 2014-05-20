@@ -235,33 +235,28 @@ extern "C" unsigned int *readfb_flinger()
     screenshotClient->update(display);
     void const* base = 0;
     uint32_t w, s, h, f;
-    size_t size = 0;
+
     base = screenshotClient->getPixels();
     w = screenshotClient->getWidth();
     h = screenshotClient->getHeight();
     s = screenshotClient->getStride();
     f = screenshotClient->getFormat();
-    size = screenshotClient->getSize();
-    L("Mallocing %d bytes\n", w*h*Bpp);
-    void* new_base;
-    new_base = malloc(w*h*Bpp);
-    void* THEFINALREFERENCE = new_base;
-    L("Malloced address: %p\n", new_base);
-    for (size_t y=0; y<h; y++) {
-        /*
-        for (size_t x=0; x<w; x++) {
-            *(new_base+(y*w + x)) = *(base+(y*w + x))
+
+    void *new_base = malloc(w * h * Bpp);
+    void *tmp_ptr = new_base;
+
+    if (s > 0) {
+        // If stride is greater than 0, then the image is non-contiguous in memory
+        // so we have copy it into a new array such that it is
+        for (size_t y = 0; y < h; y++) {
+            memcpy(tmp_ptr, base, w * Bpp);
+            // Pointer arithmetic on void pointers is frowned upon, apparently.
+            tmp_ptr = (void *)((char *)tmp_ptr + w * Bpp);
+            base = (void *)((char *)base + s * Bpp);
         }
-        base = (void *)((char *)base + s*Bpp);
-        */
-        memcpy(new_base, base, w*Bpp);
-        //L("Copied row %d\n", y);
-        new_base = new_base + w*Bpp;
-        //L("Address is now  %d\n", &new_base);
-        base = (void *)((char *)base + s*Bpp);
     }
-    L("Returning new buffer\n");
-    return (unsigned int *)THEFINALREFERENCE;
+
+    return (unsigned int *)new_base;
 }
 
 extern "C" void close_flinger()

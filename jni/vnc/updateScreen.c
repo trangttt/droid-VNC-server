@@ -21,7 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #define FUNCTION CONCAT2E(update_screen_,OUT)
 
 void FUNCTION(void)
-{	
+{
   L("Updating Screen\n");
 	int i,j,r;
 	int offset=0,pixelToVirtual;
@@ -46,7 +46,6 @@ void FUNCTION(void)
 	else if (method==FLINGER)
 		b = (OUT_T*) readBufferFlinger();
 
-  L("Buffer address is %p\n", b);
 	//a = (OUT_T*)cmpbuf;
 
 	int max_x=-1,max_y=-1, min_x=99999, min_y=99999;
@@ -195,9 +194,12 @@ void FUNCTION(void)
 
 		rfbMarkRectAsModified(vncscr, 0, 0, screenformat.width, screenformat.height);
 	}
-  L("Freeing address: %p\n", b);
-  free(b);
-  L("Freed\n");
+
+    if (method == FLINGER) {
+        // Only flinger creates a new image array (for now)
+        // Other methods do not so don't overzealously free mem.
+        free(b);
+    }
 	if (display_rotate_180)
 		rotation=r;
 }

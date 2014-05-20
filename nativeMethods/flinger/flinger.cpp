@@ -245,7 +245,7 @@ extern "C" unsigned int *readfb_flinger()
     void *new_base = malloc(w * h * Bpp);
     void *tmp_ptr = new_base;
 
-    if (s > 0) {
+    if (s > w) {
         // If stride is greater than 0, then the image is non-contiguous in memory
         // so we have copy it into a new array such that it is
         for (size_t y = 0; y < h; y++) {

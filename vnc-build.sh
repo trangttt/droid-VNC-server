@@ -6,13 +6,23 @@ DAEMON_BUILD_PATH=libs/armeabi-v7a
 LIB_BUILD_PATH=nativeMethods/libs/armeabi-v7a
 PUSH_PATH=/sdcard/vnc/files
 DEPLOY_PATH=/data/local
+CWD=$(pwd)
 
 android=18
-usage="usage: $0 [-a N]"
+usage="usage: $0 [-a N] -w"
 
-while getopts ":a:" opt; do
+build_wrapper() {
+    cd ../src
+    . build/envsetup.sh
+    cd external/nativeMethods
+    mm .
+    cd ${CWD}
+}
+
+while getopts ":a:w" opt; do
     case $opt in
         a  ) android=$OPTARG ;;
+        w  ) build_wrapper ;;
         \? ) echo $usage
            exit 1 ;;
     esac

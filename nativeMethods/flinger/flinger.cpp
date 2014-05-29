@@ -241,12 +241,12 @@ extern "C" unsigned int *readfb_flinger()
     h = screenshotClient->getHeight();
     s = screenshotClient->getStride();
 
-    void *new_base = malloc(w * h * Bpp);
-    void *tmp_ptr = new_base;
-
     if (s > w) {
         // If stride is greater than width, then the image is non-contiguous in memory
         // so we have copy it into a new array such that it is
+        void *new_base = malloc(w * h * Bpp);
+        void *tmp_ptr = new_base;
+
         for (size_t y = 0; y < h; y++) {
             memcpy(tmp_ptr, base, w * Bpp);
             // Pointer arithmetic on void pointers is frowned upon, apparently.

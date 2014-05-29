@@ -12,7 +12,9 @@ android=18
 usage="usage: $0 [-a N] -w -s"
 
 clean() {
-    rm ${LIB_BUILD_PATH}/libdvnc_flinger_sdk${android}.so 2>/dev/null
+    if [ -n "$do_build_wrapper" ]; then
+        rm ${LIB_BUILD_PATH}/libdvnc_flinger_sdk${android}.so
+    fi
     rm ${DAEMON_BUILD_PATH}/*
 }
 

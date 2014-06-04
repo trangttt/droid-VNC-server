@@ -27,14 +27,17 @@ build_wrapper() {
 }
 
 deploy_vnc() {
-    adb push ${LIB_BUILD_PATH}/libdvnc_flinger_sdk${android}.so ${PUSH_PATH}/libdvnc_flinger_sdk.so
-    adb push ${DAEMON_BUILD_PATH}/androidvncserver ${PUSH_PATH}/androidvncserver
+    SERIAL=$1
 
-    adb shell "su -c 'cp ${PUSH_PATH}/* ${DEPLOY_PATH}/.'"
+    adb -s ${SERIAL} push ${LIB_BUILD_PATH}/libdvnc_flinger_sdk${android}.so ${PUSH_PATH}/libdvnc_flinger_sdk.so
+    adb -s ${SERIAL} push ${DAEMON_BUILD_PATH}/androidvncserver ${PUSH_PATH}/androidvncserver
 
-    adb shell "su -c 'chmod 777 ${DEPLOY_PATH}/androidvncserver'"
-    adb shell "su -c 'chmod 644 ${DEPLOY_PATH}/libdvnc_flinger_sdk.so'"
+    adb -s ${SERIAL} shell "su -c 'cp ${PUSH_PATH}/* ${DEPLOY_PATH}/.'"
+
+    adb -s ${SERIAL} shell "su -c 'chmod 777 ${DEPLOY_PATH}/androidvncserver'"
+    adb -s ${SERIAL} shell "su -c 'chmod 644 ${DEPLOY_PATH}/libdvnc_flinger_sdk.so'"
 }
+
 
 while getopts ":a:ws" opt; do
     case $opt in
@@ -54,5 +57,9 @@ if [ -n "$do_build_wrapper" ]; then
 fi
 
 if [ -z "$skip_deploy" ]; then
-    deploy_vnc
+    serial_numbers=($(adb devices | awk '/device$/{print $1}'))
+
+    for i in "${serial_numbers[@]}"; do
+        deploy_vnc $i
+    done
 fi

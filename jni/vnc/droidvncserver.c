@@ -489,7 +489,7 @@ int main(int argc, char **argv)
 	initGrabberMethod();
 
 	L("Initializing virtual keyboard and touch device...\n");
-	initInput(); 
+	initInput((int)screenformat.width, (int)screenformat.height);
 
 	L("Initializing VNC server:\n");
 	L("\twidth:\t%d\n", (int)screenformat.width);

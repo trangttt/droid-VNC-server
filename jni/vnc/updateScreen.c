@@ -22,7 +22,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 void FUNCTION(void)
 {
-  L("Updating Screen\n");
 	int i,j,r;
 	int offset=0,pixelToVirtual;
 	//OUT_T* a;
@@ -34,7 +33,6 @@ void FUNCTION(void)
 		rotation+=180;
 	}
 
-  L("Getting buffer in updateScreen.\n");
 	if (method==FRAMEBUFFER) {
 		scrinfo = FB_getscrinfo();
 		b = (OUT_T*) readBufferFB();
@@ -182,7 +180,6 @@ void FUNCTION(void)
   */
 
 	if (!idle) {
-    L("Copying %d bytes into vncbuffer\n", screenformat.width*screenformat.height*screenformat.bitsPerPixel/CHAR_BIT);
 		memcpy(vncbuf,b,screenformat.width*screenformat.height*screenformat.bitsPerPixel/CHAR_BIT);
 
 		min_x--;

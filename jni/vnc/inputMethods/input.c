@@ -38,7 +38,7 @@ int spec4[] = {26,43,27,215,14};
 int spec4sh[] = {1,1,1,1,0};
 
 
-void initInput()
+void initInput(int width, int height)
 {
 	L("---Initializing uinput...---\n");
 	struct input_id id = {
@@ -48,7 +48,7 @@ void initInput()
 		1 /* Version id. */
 	}; 
 
-	if((inputfd = suinput_open("VNC", &id)) == -1)
+	if((inputfd = suinput_open("VNC", &id, width, height)) == -1)
 	{
 		L("cannot create virtual kbd device.\n");
 		sendMsgToGui("~SHOW|Cannot create virtual input device!\n");

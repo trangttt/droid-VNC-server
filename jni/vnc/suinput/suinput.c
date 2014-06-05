@@ -53,7 +53,7 @@ int suinput_write_syn(int uinput_fd, uint16_t type, uint16_t code, int32_t value
     return suinput_write(uinput_fd, EV_SYN, SYN_REPORT, 0);
 }
 
-int suinput_open(const char* device_name, const struct input_id* id)
+int suinput_open(const char* device_name, const struct input_id* id, int width, int height)
 {
     int original_errno = 0;
     int uinput_fd = -1;
@@ -127,9 +127,9 @@ int suinput_open(const char* device_name, const struct input_id* id)
     user_dev.id.version = id->version;
 
     user_dev.absmin[ABS_X] = 0;
-    user_dev.absmax[ABS_X] = 1080;
+    user_dev.absmax[ABS_X] = width;
     user_dev.absmin[ABS_Y] = 0;
-    user_dev.absmax[ABS_Y] = 1920;
+    user_dev.absmax[ABS_Y] = height;
 
     if (write(uinput_fd, &user_dev, sizeof(user_dev)) != sizeof(user_dev))
         goto err;

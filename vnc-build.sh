@@ -29,13 +29,21 @@ build_wrapper() {
 deploy_vnc() {
     SERIAL=$1
 
+    adb -s ${SERIAL} shell "su -c 'rm -d ${DEPLOY_PATH}/* 2>/dev/null'"
+    adb -s ${SERIAL} shell "su -c 'rm -d ${PUSH_PATH}/* 2>/dev/null'"
+
     adb -s ${SERIAL} push ${LIB_BUILD_PATH}/libdvnc_flinger_sdk${android}.so ${PUSH_PATH}/libdvnc_flinger_sdk.so
     adb -s ${SERIAL} push ${DAEMON_BUILD_PATH}/androidvncserver ${PUSH_PATH}/androidvncserver
+
+    if [ -e passwd ]; then
+        adb -s ${SERIAL} push passwd ${PUSH_PATH}/passwd
+    fi
 
     adb -s ${SERIAL} shell "su -c 'cp ${PUSH_PATH}/* ${DEPLOY_PATH}/.'"
 
     adb -s ${SERIAL} shell "su -c 'chmod 777 ${DEPLOY_PATH}/androidvncserver'"
     adb -s ${SERIAL} shell "su -c 'chmod 644 ${DEPLOY_PATH}/libdvnc_flinger_sdk.so'"
+    adb -s ${SERIAL} shell "su -c 'chmod 644 ${DEPLOY_PATH}/passwd 2>/dev/null'"
 }
 
 

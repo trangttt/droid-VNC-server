@@ -18,7 +18,10 @@ kill_server() {
 }
 
 start_server() {
-    adb shell "su -c '.${DAEMON_PATH}/androidvncserver -s ${scale} -m ${method}'"
+    PASS_CMD="'./${DAEMON_PATH}/androidvncserver -s ${scale} -m ${method} -e ${DAEMON_PATH}/passwd'"
+    NOPASS_CMD="'./${DAEMON_PATH}/androidvncserver -s ${scale} -m ${method}'"
+
+    adb shell "su -c 'if [ -e ${DAEMON_PATH}/passwd ]; then ${PASS_CMD}; else ${NOPASS_CMD}; fi'"
 }
 
 restart_server() {

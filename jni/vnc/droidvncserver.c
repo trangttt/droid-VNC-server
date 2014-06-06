@@ -38,6 +38,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #define CONCAT3E(a,b,c) CONCAT3(a,b,c)
 
 char VNC_PASSWORD[256] = "";
+char VNC_PASSWD_FILE[256] = "";
 /* Android already has 5900 bound natively in some devices. */
 int VNC_PORT=5901;
 
@@ -167,9 +168,14 @@ void initVncServer(int argc, char **argv)
 	vncscr->newClientHook = (rfbNewClientHookPtr)clientHook;
 	vncscr->setXCutText = CutText;
 
-	if (strcmp(VNC_PASSWORD,"")!=0)
+    if (strcmp(VNC_PASSWD_FILE, "") != 0) {
+        L("Using encrypted password file\n");
+        vncscr->authPasswdData = VNC_PASSWD_FILE;
+    }
+    else if (strcmp(VNC_PASSWORD, "") != 0)
 	{
-		char **passwords = (char **)malloc(2 * sizeof(char **));
+        L("Using plain text password\n");
+        char **passwords = (char **)malloc(2 * sizeof(char **));
 		passwords[0] = VNC_PASSWORD;
 		passwords[1] = NULL;
 		vncscr->authPasswdData = passwords;
@@ -387,6 +393,7 @@ void printUsage(char **argv)
 		"-h\t\t- Print this help\n"
 		"-m <method>\t- Display grabber method\n\t\t   fb: framebuffer\n\t\t   gb: gingerbread+ devices\n\t\t   adb: slower, but should be compatible with all devices\n"
 		"-p <password>\t- Password to access server\n"
+		"-e <path to encrypted password file>\t- path to encrypted password file to access server\n"
 		"-r <rotation>\t- Screen rotation (degrees) (0,90,180,270)\n"
 		"-R <host:port>\t- Host for reverse connection\n" 
 		"-s <scale>\t- Scale percentage (20,30,50,100,150)\n"
@@ -421,6 +428,14 @@ int main(int argc, char **argv)
 						i++; 
 						strcpy(VNC_PASSWORD,argv[i]);
 						break;
+                    case 'e':
+                        i++;
+                        strcpy(VNC_PASSWD_FILE, argv[i]);
+                        L("Using %s\n", VNC_PASSWD_FILE);
+
+                        // -p and -e are mutually exclusive with -e taking precedence
+                        strcpy(VNC_PASSWORD, "");
+                        break;
 					case 'f': 
 						i++; 
 						FB_setDevice(argv[i]);

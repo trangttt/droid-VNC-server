@@ -29,10 +29,16 @@ restart_server() {
     start_server
 }
 
-while getopts ":s:m:" opt; do
+show_version() {
+    adb shell "su -c './${DAEMON_PATH}/androidvncserver -v'"
+}
+
+while getopts ":s:m:v" opt; do
     case $opt in
         s  ) scale=$OPTARG ;;
         m  ) method=$OPTARG ;;
+        v  ) show_version
+            exit 1 ;;
         \? ) echo $usage
             exit 1 ;;
     esac

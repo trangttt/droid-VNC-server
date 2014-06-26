@@ -400,6 +400,7 @@ void printUsage(char **argv)
 		"-z\t\t- Rotate display 180º (for zte compatibility)\n"
 		"-U <host:port>\t- UltraVNC Repeater host and port\n"
 		"-S <id>\t\t- UltraVNC Repeater Numerical Server ID for MODE 2\n"
+		"-v\t\t- Output version\n"
 		"\n");
 }
 
@@ -494,6 +495,12 @@ int main(int argc, char **argv)
 							L("Grab method \"%s\" not found, sticking with auto-detection.\n",argv[i]);
 						}
 						break;
+					case 'v':
+						i++;
+						// VERSION is passed in as a gcc parameter
+						// See Android.mk and vnc-build.sh
+						printf("androidvncserver version %s\n", VERSION);
+						return;
 				}
 			}
 			i++;

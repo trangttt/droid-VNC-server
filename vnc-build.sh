@@ -10,6 +10,7 @@ CWD=$(pwd)
 
 android=18
 usage="usage: $0 [-a N] -w -s"
+version=($(cat jni/vnc/VERSION))
 
 clean() {
     if [ -n "$do_build_wrapper" ]; then
@@ -58,7 +59,7 @@ while getopts ":a:ws" opt; do
 done
 
 clean
-ndk-build
+ndk-build VERSION=\"${version}\" -e
 
 if [ -n "$do_build_wrapper" ]; then
     build_wrapper

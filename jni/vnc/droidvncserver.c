@@ -497,9 +497,8 @@ int main(int argc, char **argv)
 						break;
 					case 'v':
 						i++;
-						// VERSION is passed in as a gcc parameter
-						// See Android.mk and vnc-build.sh
-						printf("androidvncserver version %s\n", VERSION);
+            // This is where we store the version.
+						printf("androidvncserver version 1.0.1\n");
 						return;
 				}
 			}

@@ -43,8 +43,7 @@ LOCAL_CFLAGS  +=  -Wall -Wno-unused-variable -Wno-maybe-uninitialized -Wno-unuse
 									-DLIBVNCSERVER_HAVE_LIBPNG \
 									-DLIBVNCSERVER_HAVE_ZLIB \
 									-DLIBVNCSERVER_HAVE_LIBJPEG \
-									-DNOAPP \
-									-DVERSION=\"$(VERSION)\"
+									-DNOAPP
 
 LOCAL_LDLIBS +=  -llog -lz -ldl
 

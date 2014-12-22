@@ -5,7 +5,7 @@
 DAEMON_BUILD_PATH=libs/armeabi-v7a
 LIB_BUILD_PATH=nativeMethods/libs/armeabi-v7a
 PUSH_PATH=/sdcard/vnc/files
-DEPLOY_PATH=/data/local
+DEPLOY_PATH=/data/local/tmp
 CWD=$(pwd)
 
 android=18

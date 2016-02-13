@@ -23,7 +23,7 @@ public class ResLoader {
      */
 
     static void unpackResources(int id,Context C,String destFolder) throws FileNotFoundException, IOException {
-    	 // Open the ZipInputStream
+         // Open the ZipInputStream
         ZipInputStream inputStream = new ZipInputStream(C.getResources().openRawResource(id));
 
         // Loop through all the files and folders
@@ -67,15 +67,15 @@ public class ResLoader {
                 bufferedOutputStream.flush();
                 bufferedOutputStream.close();
             }
-            
+
             // Close the current entry
             inputStream.closeEntry();
         }
         inputStream.close();
     }
-    
-	public static void log(String s)
-	{ 
-		Log.v(MainActivity.VNC_LOG,s);
-	}
+
+    public static void log(String s)
+    {
+        Log.v(MainActivity.VNC_LOG,s);
+    }
 }

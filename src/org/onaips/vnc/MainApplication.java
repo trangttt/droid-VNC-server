@@ -16,87 +16,87 @@ import android.util.Log;
 
 public class MainApplication extends Application {
 
- 
 
-	@Override 
-	public void onCreate() {
-		super.onCreate(); 
-		//if (firstRun()) 
-			createBinaries();
-	}    
- 
-	public void log(String s)
-	{ 
-		Log.v(MainActivity.VNC_LOG,s); 
-	}
 
-	public boolean firstRun()
-	{
-		int versionCode = 0;
-		try {
-			versionCode = getPackageManager()
-			.getPackageInfo(getPackageName(), PackageManager.GET_META_DATA)
-			.versionCode;
-		} catch (NameNotFoundException e) {
-			log("Package not found... Odd, since we're in that package..." + e.getMessage());
-		}
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        //if (firstRun())
+            createBinaries();
+    }
 
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-		int lastFirstRun = prefs.getInt("last_run", 0);
+    public void log(String s)
+    {
+        Log.v(MainActivity.VNC_LOG,s);
+    }
 
-		if (lastFirstRun >= versionCode) {
-			log("Not first run");
-			return false; 
-		}
-		log("First run for version " + versionCode); 
+    public boolean firstRun()
+    {
+        int versionCode = 0;
+        try {
+            versionCode = getPackageManager()
+            .getPackageInfo(getPackageName(), PackageManager.GET_META_DATA)
+            .versionCode;
+        } catch (NameNotFoundException e) {
+            log("Package not found... Odd, since we're in that package..." + e.getMessage());
+        }
 
-		SharedPreferences.Editor editor = prefs.edit();
-		editor.putInt("last_run", versionCode);
-		editor.commit(); 
-		return true;
-	}   
- 
-	public void createBinaries()  
-	{   
-		String filesdir = getFilesDir().getAbsolutePath()+"/";
- 
-		//copy html related stuff
-		copyBinary(R.raw.webclients, filesdir + "/webclients.zip");
-		 
-		try {
-			ResLoader.unpackResources(R.raw.webclients, getApplicationContext(),filesdir);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-	}
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        int lastFirstRun = prefs.getInt("last_run", 0);
 
-	public void copyBinary(int id,String path)
-	{
-		log("copy -> " + path);
-		try {
-			InputStream ins = getResources().openRawResource(id);
-			int size = ins.available();
+        if (lastFirstRun >= versionCode) {
+            log("Not first run");
+            return false;
+        }
+        log("First run for version " + versionCode);
 
-			// Read the entire resource into a local byte buffer.
-			byte[] buffer = new byte[size];
-			ins.read(buffer);
-			ins.close();
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putInt("last_run", versionCode);
+        editor.commit();
+        return true;
+    }
 
-			FileOutputStream fos = new FileOutputStream(path);
-			fos.write(buffer);
-			fos.close();
-		}
-		catch (Exception e)
-		{
-			log("public void createBinary() error! : " + e.getMessage());
-		}
-	}  
+    public void createBinaries()
+    {
+        String filesdir = getFilesDir().getAbsolutePath()+"/";
 
-	static void writeCommand(OutputStream os, String command) throws Exception
-	{
-		os.write((command + "\n").getBytes("ASCII"));
-	} 
+        //copy html related stuff
+        copyBinary(R.raw.webclients, filesdir + "/webclients.zip");
+
+        try {
+            ResLoader.unpackResources(R.raw.webclients, getApplicationContext(),filesdir);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public void copyBinary(int id,String path)
+    {
+        log("copy -> " + path);
+        try {
+            InputStream ins = getResources().openRawResource(id);
+            int size = ins.available();
+
+            // Read the entire resource into a local byte buffer.
+            byte[] buffer = new byte[size];
+            ins.read(buffer);
+            ins.close();
+
+            FileOutputStream fos = new FileOutputStream(path);
+            fos.write(buffer);
+            fos.close();
+        }
+        catch (Exception e)
+        {
+            log("public void createBinary() error! : " + e.getMessage());
+        }
+    }
+
+    static void writeCommand(OutputStream os, String command) throws Exception
+    {
+        os.write((command + "\n").getBytes("ASCII"));
+    }
 }

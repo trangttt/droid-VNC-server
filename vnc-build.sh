@@ -8,7 +8,7 @@ PUSH_PATH=/sdcard/vnc/files
 DEPLOY_PATH=/data/local/tmp
 CWD=$(pwd)
 
-android=18
+android=19
 usage="usage: $0 [-a N] -w -s"
 
 clean() {
@@ -19,7 +19,7 @@ clean() {
 }
 
 build_wrapper() {
-    cd ../src
+    cd ../aosp
     . build/envsetup.sh
     cd external/nativeMethods
     mm .

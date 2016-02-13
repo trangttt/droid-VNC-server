@@ -3,5 +3,6 @@ gen
 libs
 obj
 local.properties
+secure.properties
 proguard-project.txt
 *.swp

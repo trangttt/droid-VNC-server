@@ -25,7 +25,8 @@
 #include <binder/IPCThreadState.h>
 #include <binder/ProcessState.h>
 #include <binder/IServiceManager.h>
-
+#include <binder/IBinder.h>
+#include <utils/RefBase.h>
 #include <binder/IMemory.h>
 #include <gui/ISurfaceComposer.h>
 #include <gui/SurfaceComposerClient.h>

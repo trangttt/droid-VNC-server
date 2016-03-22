@@ -18,6 +18,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 */
 
 #include <dlfcn.h>
+#include <errno.h>
 
 #include "flinger.h"
 #include "common.h"
@@ -35,11 +36,14 @@ int initFlinger(void)
     int i,len;
     char lib_name[64];
     sprintf(lib_name, DVNC_LIB_PATH "/libdvnc_flinger_sdk.so");
+    L("lib_name: %s\n", lib_name);
 
     // 1. Open lib
     flinger_lib = dlopen(lib_name, RTLD_NOW);
     if (flinger_lib == NULL) {
-        L("Couldnt load flinger library %s! Error string: %s\n", lib_name, dlerror());
+        int errsv = errno;
+        const char * err = dlerror();
+        L("Couldnt load flinger library %s! Err no: %d. Error string: %s\n", lib_name, errsv, err);
         return -1;
     }
 
